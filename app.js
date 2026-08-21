@@ -62,17 +62,32 @@ function actualiserPreview(){
     box.style.display='block'; box.style.opacity='1';
     box.style.maskImage=`url("${structure}")`; box.style.webkitMaskImage=`url("${structure}")`;
     box.style.backgroundColor='transparent';
-    if(mat==='Fantaisies') {
-      // Les motifs Fantaisie doivent rester lisibles comme sur la swatch :
-      // répétition du motif avec une échelle réduite, sans l'étirer sur tout le brin.
+    const render = configVisuels.materials?.[mat]?.render || {};
+    const repeatTexture = !!render.repeat;
+    const textureSize = render.size || 'cover';
+    const texturePosition = render.position || 'center center';
+    if(mat==="Nid d'abeille") {
+      // Nid d'abeille : on n'étire pas la photo du tissu. On applique uniquement
+      // la couleur choisie sous la structure réelle du brin, afin de conserver
+      // le relief nid d'abeille visible en 3 et 4 brins.
+      const color = configVisuels.materials?.[mat]?.colors?.[coul]?.color || '#ffffff';
+      box.style.backgroundColor = color;
+      box.style.backgroundImage = `url("${structure}")`;
+      box.style.backgroundRepeat = 'no-repeat';
+      box.style.backgroundSize = '100% 100%';
+      box.style.backgroundPosition = 'center center';
+      box.style.backgroundBlendMode = 'multiply';
+    } else if(mat==='Fantaisies') {
       box.style.backgroundImage=`url("${texture}")`;
-      box.style.backgroundRepeat='repeat';
-      box.style.backgroundSize='30% auto';
-      box.style.backgroundPosition='center center';
+      box.style.backgroundRepeat=repeatTexture ? 'repeat' : 'no-repeat';
+      box.style.backgroundSize=textureSize;
+      box.style.backgroundPosition=texturePosition;
       box.style.backgroundBlendMode='normal';
     } else {
       box.style.backgroundImage=`url("${structure}"), url("${texture}")`;
       box.style.backgroundSize='100% 100%, cover';
+      box.style.backgroundPosition='center center, center center';
+      box.style.backgroundRepeat='no-repeat, no-repeat';
     }
     any=true;
   });
